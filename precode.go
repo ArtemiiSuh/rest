@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// perezaliv
 type Task struct {
 	ID           string   `json:"id"`
 	Description  string   `json:"description"`
@@ -49,10 +48,10 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, _ = w.Write(resp)
 }
 
-func postTask(w http.ResponseWriter, r *http.Request) {
+func addTask(w http.ResponseWriter, r *http.Request) {
 	var tsk Task
 	var buf bytes.Buffer
 
@@ -93,12 +92,12 @@ func getTsk(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func delTsk(w http.ResponseWriter, r *http.Request) {
+func deleteTask(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	task, ok := tasks[id]
 	if !ok {
-		http.Error(w, "No tasks", http.StatusNoContent)
+		http.Error(w, "No tasks", http.StatusBadRequest)
 		return
 	}
 
@@ -117,9 +116,9 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Get("/tasks", getTasks)
-	r.Post("/tasks", postTask)
+	r.Post("/tasks", addTask)
 	r.Get("/tasks/{id}", getTsk)
-	r.Delete("/tasks/{id}", delTsk)
+	r.Delete("/tasks/{id}", deleteTask)
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
