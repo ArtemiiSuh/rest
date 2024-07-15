@@ -65,6 +65,9 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	if _, ok := tasks[tsk.ID]; ok {
+		http.Error(w, "Задача с таким ID существует", http.StatusBadRequest)
+	}
 
 	tasks[tsk.ID] = tsk
 
@@ -77,7 +80,7 @@ func getTsk(w http.ResponseWriter, r *http.Request) {
 
 	task, ok := tasks[id]
 	if !ok {
-		http.Error(w, "No tasks", http.StatusNoContent)
+		http.Error(w, "No tasks", http.StatusBadRequest)
 		return
 	}
 
@@ -89,7 +92,7 @@ func getTsk(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, _ = w.Write(resp)
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
